@@ -20,16 +20,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getUserPageCount, getUsers } from "@/mocks/users";
+import { getUserPageCountFromDB, getUsersFromDB } from "@/lib/db";
+import { deleteUser } from "@/lib/actions";
 import { SquarePen, Trash } from "lucide-react";
 import Link from "next/link";
 import AdminBreadcrumb from "../_components/admin-breadcrumb";
+import { DeleteButton } from "@/components/delete-button";
 
 export default async function Page(props: { searchParams: Promise<any> }) {
   const { page } = (await props.searchParams);
   const pageInt = page ? parseInt(page) : 1;
-  const pageCount = getUserPageCount();
-  const users = getUsers(pageInt);
+  const pageSize = 10;
+  const pageCount = await getUserPageCountFromDB(pageSize);
+  const users = await getUsersFromDB(pageInt, pageSize);
   return (
     <>
       <AdminBreadcrumb title="User Management" />
@@ -56,24 +59,24 @@ export default async function Page(props: { searchParams: Promise<any> }) {
                   </TableRow>
                 ) : (
                   users.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>{user.id}</TableCell>
+                    <TableRow key={user.user_id}>
+                      <TableCell>{user.user_id}</TableCell>
                       <TableCell>
                         <Avatar>
                           <AvatarImage
-                            src={user.profileImage}
-                            alt={user.name}
+                            src={user.avatar}
+                            alt={user.user_name}
                           />
-                          <AvatarFallback>{user.name[0]}</AvatarFallback>
+                          <AvatarFallback>{user.user_name[0]}</AvatarFallback>
                         </Avatar>
                       </TableCell>
                       <TableCell>
-                        <Link href={`/admin/users/${user.id}`} className="text-primary underline">
-                          {user.name}
+                        <Link href={`/admin/users/${user.user_id}`} className="text-primary underline">
+                          {user.user_name}
                         </Link>
                       </TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.phone}</TableCell>
+                      <TableCell>{user.user_email}</TableCell>
+                      <TableCell>{user.user_phone}</TableCell>
                       <TableCell className="flex gap-2">
                         <Button
                           variant="ghost"
@@ -81,7 +84,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
                           color="primary"
                           asChild
                         >
-                          <Link href={`/admin/users/${user.id}`}>
+                          <Link href={`/admin/users/${user.user_id}`}>
                             <SquarePen className="w-6 h-6" />
                           </Link>
                         </Button>
@@ -101,16 +104,16 @@ export default async function Page(props: { searchParams: Promise<any> }) {
                                 Are you absolutely sure?
                               </DialogTitle>
                               <DialogDescription>
-                                This action cannot be undone. This will
-                                permanently delete your account and remove your
-                                data from our servers.
+                                This action cannot be undone. This will permanently
+                                delete the user account and remove their data from
+                                our servers.
                               </DialogDescription>
                             </DialogHeader>
                             <DialogFooter>
                               <DialogClose asChild>
                                 <Button variant="ghost">Cancel</Button>
                               </DialogClose>
-                              <Button variant="destructive">Delete</Button>
+                              <DeleteButton userId={user.user_id} />
                             </DialogFooter>
                           </DialogContent>
                         </Dialog>
