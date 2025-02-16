@@ -1,6 +1,6 @@
 export type Shelter = {
   id: number;
-  name: string;
+  shelter_name: string;
   email: string;
   phone: string;
   profileImage: string;

@@ -4,7 +4,11 @@ import ImpactSection from "@/components/ui/impact";
 import { PawPrint } from "lucide-react";
 import Link from "next/link";
 
-const LandingPage = () => {
+const LandingPage = async () => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/pets?page=1&limit=8`);
+  const data = await res.json();
+  const pets = data.pets;
+
   return (
     <>
       <div className="landing-page bg-gray-100 min-h-[calc(100vh-120px)] py-10 px-8">
@@ -18,7 +22,7 @@ const LandingPage = () => {
               Your one-stop destination to find your new best friend.
             </p>
           </header>
-          <PetContainer page={1} limit={8} />
+          <PetContainer pets={pets} />
           <div className="flex justify-center mt-4">
             <Button asChild>
               <Link href="/app/pets">Browse Pets</Link>
