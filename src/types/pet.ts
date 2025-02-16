@@ -2,16 +2,16 @@ import { Shelter } from "./shelter";
 import { User } from "./users";
 
 export type Pet = {
-  id: number;
-  name: string;
-  age: number;
+  pet_id: number;
+  pet_name: string;
+  age: string;
   gender: string;
-  profileImage: string;
+  avatar: string;
   location: string;
   shelter?: Shelter;
   owner?: User;
   ownership?: 'shelter' | 'owner';
-  description?: string;
+  about?: string;
   weight: number;
   color: string;
   size: string;

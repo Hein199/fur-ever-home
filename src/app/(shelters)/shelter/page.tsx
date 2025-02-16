@@ -9,7 +9,16 @@ import Link from "next/link";
 const PetList = async (props: { searchParams: Promise<any> }) => {
   const { page } = await props.searchParams;
   const pageInt = page ? parseInt(page) : 1;
-  const pageCount = getPetPageCount();
+  // const pageCount = getPetPageCount();
+
+  // Fetch pets from the API
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/pets?page=${pageInt}&limit=12`
+  );
+  const data = await response.json();
+
+  const pets = data.pets;
+  const pageCount = data.totalPages;
 
   return (
     <div>
@@ -25,7 +34,7 @@ const PetList = async (props: { searchParams: Promise<any> }) => {
               <Link href="/shelter/pets/new">Add New Pet</Link>
             </Button> */}
           </header>
-          <PetContainer page={pageInt} limit={12} />
+          <PetContainer pets={pets} />
           <div className="mt-8">
             <Pagination page={pageInt} totalPage={pageCount} />
           </div>

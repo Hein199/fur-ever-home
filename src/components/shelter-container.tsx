@@ -22,13 +22,13 @@ export default function ShelterContainer(props: {
             <CardHeader className="p-0">
               <Image
                 src={shelter.profileImage}
-                alt={shelter.name}
+                alt={shelter.shelter_name}
                 width={400}
                 height={300}
                 className="w-full"
                 objectFit="cover"
               />
-              <CardTitle className="py-2 px-4">{shelter.name}</CardTitle>
+              <CardTitle className="py-2 px-4">{shelter.shelter_name}</CardTitle>
             </CardHeader>
             <CardContent className="pb-2 px-4 line-clamp-1">
               {/* <p>{shelter.description}</p> */}
