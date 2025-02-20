@@ -1,6 +1,6 @@
 'use server';
 
-import { updateUserInDB, deleteUserFromDB } from './db';
+import { updateUserInDB, deleteUserFromDB } from './database';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
