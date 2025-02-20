@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getUsersFromDB, getUserPageCountFromDB } from "@/lib/db";
+import { getUsersFromDB, getUserPageCountFromDB } from "@/lib/database";
 
 export async function GET(req: Request) {
     try {

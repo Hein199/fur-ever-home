@@ -1,15 +1,15 @@
 // src/app/admin/users/[id]/page.tsx
 import { UserForm } from './user-form';
-import { getUserByIdFromDB } from '@/lib/db';
+import { getUserByIdFromDB } from '@/lib/database';
 import AdminBreadcrumb from '../../_components/admin-breadcrumb';
 import { notFound } from 'next/navigation';
 
 export default async function UserDetailPage({
-  params,
+  params: { id },
 }: {
   params: { id: string };
 }) {
-  const userId = Number(params.id);
+  const userId = Number(id);
   if (isNaN(userId)) notFound();
 
   const user = await getUserByIdFromDB(userId);

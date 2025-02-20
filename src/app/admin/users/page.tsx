@@ -20,8 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getUserPageCountFromDB, getUsersFromDB } from "@/lib/db";
-import { deleteUser } from "@/lib/actions";
+import { getUserPageCountFromDB, getUsersFromDB } from "@/lib/database";
 import { SquarePen, Trash } from "lucide-react";
 import Link from "next/link";
 import AdminBreadcrumb from "../_components/admin-breadcrumb";
