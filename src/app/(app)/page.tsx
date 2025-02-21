@@ -3,11 +3,15 @@ import { Button } from "@/components/ui/button";
 import ImpactSection from "@/components/ui/impact";
 import { PawPrint } from "lucide-react";
 import Link from "next/link";
+import { IKImage } from "imagekitio-next";
 
 const LandingPage = async () => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/pets?page=1&limit=8`);
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/pets?page=1&limit=8`
+  );
   const data = await res.json();
   const pets = data.pets;
+  console.log(pets);
 
   return (
     <>
@@ -23,6 +27,7 @@ const LandingPage = async () => {
             </p>
           </header>
           <PetContainer pets={pets} />
+
           <div className="flex justify-center mt-4">
             <Button asChild>
               <Link href="/app/pets">Browse Pets</Link>
