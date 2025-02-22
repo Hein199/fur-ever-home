@@ -121,3 +121,30 @@ export const getShelterByIdFromDB = async (shelterId: number) => {
       return null;
     }
   };
+  // src/lib/database.ts
+
+// Function to get shelters from the database
+export const getSheltersFromDB = async (page: number = 1, limit: number = 10) => {
+    try {
+        const offset = (page - 1) * limit;
+        const result = await query(
+            "SELECT * FROM shelter ORDER BY shelter_id LIMIT $1 OFFSET $2",
+            [limit, offset]
+        );
+        return result.rows;
+    } catch (error) {
+        console.error("Error fetching shelters:", error);
+        return [];
+    }
+};
+
+// Function to get total shelter count for pagination
+export const getShelterPageCountFromDB = async (limit: number = 10) => {
+    try {
+        const result = await query("SELECT COUNT(*) FROM shelter");
+        return Math.ceil(Number(result.rows[0].count) / limit);
+    } catch (error) {
+        console.error("Error fetching shelter count:", error);
+        return 1;
+    }
+};

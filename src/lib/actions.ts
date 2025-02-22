@@ -120,4 +120,31 @@ export async function updateShelter(
       throw new Error('Failed to delete shelter. Please try again.');
     }
   }
+//Shelter_register
+export async function approveShelter(shelterId: number): Promise<void> {
+    try {
+      await query(
+        `UPDATE shelter SET status = 'Approved' WHERE shelter_id = $1`,
+        [shelterId]
+      );
+      revalidatePath('/admin/shelters-registration');
+    } catch (error) {
+      console.error('Error approving shelter:', error);
+      throw new Error('Failed to approve shelter');
+    }
+  }
+  
+  // Action to reject a shelter
+  export async function rejectShelter(shelterId: number): Promise<void> {
+    try {
+      await query(
+        `UPDATE shelter SET status = 'Rejected' WHERE shelter_id = $1`,
+        [shelterId]
+      );
+      revalidatePath('/admin/shelters-registration');
+    } catch (error) {
+      console.error('Error rejecting shelter:', error);
+      throw new Error('Failed to reject shelter');
+    }
+  }
   
