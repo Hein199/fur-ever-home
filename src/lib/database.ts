@@ -226,6 +226,9 @@ export const deletePetFromDB = async (petId: number) => {
     } catch (error) {
         console.error("Error deleting pet:", error);
         return { success: false, error: "Failed to delete pet" };
+    }
+};
+
 // src/lib/database.ts
 export const getShelterByIdFromDB = async (shelterId: number) => {
     try {
