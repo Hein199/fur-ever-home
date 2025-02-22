@@ -4,23 +4,42 @@ import { Pet } from "@/types/pet";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { IKImage } from "imagekitio-next";
+import config from "@/lib/config";
+import { url } from "inspector";
 
 const PetCard = ({ pet }: { pet: Pet }) => {
   const pathname = usePathname();
   const isShelter = pathname.startsWith("/shelter");
 
   // const petAvatar = pet.avatar || "/default-pet-avatar.png";
-  const defaultImage = '/assets/pets/1.jpg'; // Place a mock image in the public/images folder
-  const imageUrl = pet.avatar && pet.avatar.startsWith('http')
-    ? pet.avatar
-    : defaultImage;
+  const defaultImage = "/assets/pets/1.jpg"; // Place a mock image in the public/images folder
+  const imageUrl =
+    pet.avatar && pet.avatar.startsWith("http") ? pet.avatar : defaultImage;
 
+  const avatarpath = "/pets/images_7-bIAfoSJ.jpeg";
   return (
     <div className="w-full">
-      <Link href={isShelter ? `/shelter/pets/${pet.pet_id}` : `/app/pets/${pet.pet_id}`}>
+      <Link
+        href={
+          isShelter ? `/shelter/pets/${pet.pet_id}` : `/app/pets/${pet.pet_id}`
+        }
+      >
         <div className="relative overflow-hidden shadow-lg cursor-pointer">
-          <Image
+          {/* <Image
             src={imageUrl}
+            alt={pet.pet_name}
+            width={400}
+            height={400}
+            className="w-full h-96 object-cover transition-transform duration-300 transform hover:scale-110"
+          /> */}
+
+          {/*
+              path specifies the path of the image to be fetched from database
+          */}
+          <IKImage
+            path={avatarpath}
+            urlEndpoint={config.env.imagekit.urlEndpoint}
             alt={pet.pet_name}
             width={400}
             height={400}

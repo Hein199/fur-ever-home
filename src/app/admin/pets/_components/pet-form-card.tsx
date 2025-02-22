@@ -23,7 +23,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Pet } from "@/types/pet";
-import Image from "next/image";
+import ImageUpload from "@/components/ImageUpload";
+import { useState } from "react";
 
 interface PetFormCardProps {
   pet?: Pet;
@@ -32,8 +33,9 @@ interface PetFormCardProps {
 
 export default function PetFormCard({ pet, isEditable }: PetFormCardProps) {
   const isCreate = !pet;
-
-  const { toast } = useToast()
+  const urlEndpoint = process.env.NEXT_PUBLIC_URL_ENDPOINT;
+  const { toast } = useToast();
+  const [image, setImage] = useState<string>();
 
   // const onUpdate = (pet: Pet) => {
   //   console.log("Update", pet);
@@ -44,8 +46,8 @@ export default function PetFormCard({ pet, isEditable }: PetFormCardProps) {
   const onDelete = (pet: Pet) => {
     toast({
       title: "Pet deleted",
-      description: `${pet.name} has been removed from the database.`,
-    })
+      description: `${pet.pet_name} has been removed from the database.`,
+    });
     console.log("Delete", pet);
   };
 
@@ -56,25 +58,34 @@ export default function PetFormCard({ pet, isEditable }: PetFormCardProps) {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex justify-center">
-          <div className="h-40 w-40">
-            <ImagePicker
-              defaultValue={pet?.profileImage}
-              onImageChange={(file) => console.log(file)}
-              editable={isEditable}
+          <div>
+            <ImageUpload
+              type="image"
+              accept="image/*"
+              placeholder="Upload a pet image"
+              folder="pets"
+              variant="light"
+              onFileChange={(filePath) => setImage(filePath)}
+              value={image}
             />
           </div>
         </div>
 
+        {/* 
+          store this string - image in the database 
+        */}
+
+        {image && <div className="flex justify-center">{image}</div>}
         <div className="space-y-4">
-          {pet?.id && (
+          {pet?.pet_id && (
             <div className="space-y-2">
               <Label htmlFor="pet-id">Pet ID</Label>
-              <Input id="pet-id" value={pet?.id} readOnly />
+              <Input id="pet-id" value={pet?.pet_id} readOnly />
             </div>
           )}
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" defaultValue={pet?.name} />
+            <Input id="name" defaultValue={pet?.pet_name} />
           </div>
 
           <div className="space-y-2">
@@ -110,7 +121,7 @@ export default function PetFormCard({ pet, isEditable }: PetFormCardProps) {
                 <DialogTitle>Are you sure?</DialogTitle>
                 <DialogDescription>
                   This action cannot be undone. This will permanently delete{" "}
-                  {pet?.name} from the database.
+                  {pet?.pet_name} from the database.
                 </DialogDescription>
               </DialogHeader>
               <div className="flex justify-end gap-3">
