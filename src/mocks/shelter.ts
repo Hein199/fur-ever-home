@@ -1,17 +1,17 @@
 import { Shelter } from "@/types/shelter";
 import { faker } from "@faker-js/faker";
-
+import { query } from "@/lib/database";
 const limit = 15;
 
 export const createRandomShelter = (id: number): Shelter => {
   return {
-    id: id,
-    name: faker.person.fullName(),
-    email: faker.internet.email(),
-    phone: faker.phone.number({
+    shelter_id: id,
+    shelter_name: faker.person.fullName(),
+    shelter_email: faker.internet.email(),
+    shelter_phone: faker.phone.number({
       style: "national"
     }),
-    profileImage: faker.image.urlPicsumPhotos({
+    avatar: faker.image.urlPicsumPhotos({
       width: 400,
       height: 400,
       blur: 1,
@@ -27,14 +27,16 @@ export const createRandomShelter = (id: number): Shelter => {
   };
 };
 
-export const getShelters = (page: number): Shelter[] => {
-  const shelters: Shelter[] = [];
-  for (let i = 1; i <= limit; i++) {
-    shelters.push(createRandomShelter((page - 1) * limit + i));
-  }
-  return shelters;
-}
+export const getShelters = async (page: number, limit: number = 10) => {
+  const offset = (page - 1) * limit;
+  const result = await query(
+    "SELECT * FROM shelter WHERE status = 'Approved' ORDER BY shelter_id LIMIT $1 OFFSET $2",
+    [limit, offset]
+  );
+  return result.rows;
+};
 
-export const getShelterPageCount = (): number => {
-  return 10;
-}
+export const getShelterPageCount = async (limit: number = 10) => {
+  const result = await query("SELECT COUNT(*) FROM shelter WHERE status = 'Approved'");
+  return Math.ceil(Number(result.rows[0].count) / limit);
+};

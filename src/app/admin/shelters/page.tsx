@@ -1,3 +1,7 @@
+// src/app/admin/shelters/page.tsx
+import { getShelterPageCount, getShelters } from '@/mocks/shelter';
+
+import {deleteShelter} from '@/lib/actions'; 
 import AppPagination from "@/components/pagination";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -20,16 +24,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getShelterPageCount, getShelters } from "@/mocks/shelter";
 import { SquarePen, Trash } from "lucide-react";
 import AdminBreadcrumb from "../_components/admin-breadcrumb";
 import Link from "next/link";
 
-export default async function Page(props: { searchParams: Promise<any> }) {
-  const { page } = (await props.searchParams);
-  const pageInt = page ? parseInt(page) : 1;
-  const pageCount = getShelterPageCount();
-  const shelters = getShelters(pageInt);
+export default async function Page({ searchParams }: { searchParams: { page: string } }) {
+  const pageInt = searchParams.page ? parseInt(searchParams.page) : 1;
+  const pageCount = await getShelterPageCount(); // Await the page count
+  const shelters = await getShelters(pageInt); // Await the shelters data
+
   return (
     <>
       <AdminBreadcrumb title="Shelter Management" />
@@ -51,33 +54,36 @@ export default async function Page(props: { searchParams: Promise<any> }) {
               <TableBody>
                 {shelters.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center">
+                    <TableCell colSpan={7} className="h-24 text-center">
                       No shelters found.
                     </TableCell>
                   </TableRow>
                 ) : (
                   shelters.map((shelter) => (
-                    <TableRow key={shelter.id}>
-                      <TableCell>{shelter.id}</TableCell>
+                    <TableRow key={shelter.shelter_id}>
+                      <TableCell>{shelter.shelter_id}</TableCell>
                       <TableCell>
                         <Avatar>
                           <AvatarImage
-                            src={shelter.profileImage}
-                            alt={shelter.name}
+                            src={shelter.avatar}
+                            alt={shelter.shelter_name}
                           />
-                          <AvatarFallback>{shelter.name[0]}</AvatarFallback>
+                          <AvatarFallback>{shelter.shelter_name[0]}</AvatarFallback>
                         </Avatar>
                       </TableCell>
                       <TableCell>
-                      <Link href={{
-                          pathname: `/admin/shelters/${shelter.id}`,
-                          search: `?origin=management`
-                        }} className="text-primary underline">
-                          {shelter.name}
+                        <Link
+                          href={{
+                            pathname: `/admin/shelters/${shelter.shelter_id}`,
+                            search: `?origin=management`,
+                          }}
+                          className="text-primary underline"
+                        >
+                          {shelter.shelter_name}
                         </Link>
                       </TableCell>
-                      <TableCell>{shelter.email}</TableCell>
-                      <TableCell>{shelter.phone}</TableCell>
+                      <TableCell>{shelter.shelter_email}</TableCell>
+                      <TableCell>{shelter.shelter_phone}</TableCell>
                       <TableCell>{shelter.location}</TableCell>
                       <TableCell className="flex gap-2">
                         <Button
@@ -86,7 +92,10 @@ export default async function Page(props: { searchParams: Promise<any> }) {
                           color="primary"
                           asChild
                         >
-                          <Link href={`/admin/shelters/${shelter.id}`} className="text-primary underline">
+                          <Link
+                            href={`/admin/shelters/${shelter.shelter_id}`}
+                            className="text-primary underline"
+                          >
                             <SquarePen className="w-6 h-6" />
                           </Link>
                         </Button>
@@ -106,16 +115,24 @@ export default async function Page(props: { searchParams: Promise<any> }) {
                                 Are you absolutely sure?
                               </DialogTitle>
                               <DialogDescription>
-                                This action cannot be undone. This will
-                                permanently delete your account and remove your
-                                data from our servers.
+                                This action cannot be undone. This will permanently
+                                delete the shelter and remove its data from the database.
                               </DialogDescription>
                             </DialogHeader>
                             <DialogFooter>
                               <DialogClose asChild>
                                 <Button variant="ghost">Cancel</Button>
                               </DialogClose>
-                              <Button variant="destructive">Delete</Button>
+                              <form action={deleteShelter}>
+                                <input
+                                  type="hidden"
+                                  name="shelterId"
+                                  value={shelter.shelter_id}
+                                />
+                                <Button variant="destructive" type="submit">
+                                  Delete
+                                </Button>
+                              </form>
                             </DialogFooter>
                           </DialogContent>
                         </Dialog>
