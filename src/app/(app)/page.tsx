@@ -1,17 +1,46 @@
+"use client";
+
 import PetContainer from "@/components/pet-container";
 import { Button } from "@/components/ui/button";
 import ImpactSection from "@/components/ui/impact";
 import { PawPrint } from "lucide-react";
 import Link from "next/link";
 import { IKImage } from "imagekitio-next";
+import { useAuth } from "@/context/auth-context";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-const LandingPage = async () => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/pets?page=1&limit=8`
-  );
-  const data = await res.json();
-  const pets = data.pets;
-  console.log(pets);
+const LandingPage = () => {
+  const { user } = useAuth();
+  const router = useRouter();
+  const [pets, setPets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
+    const fetchPets = async () => {
+      try {
+        const res = await fetch(`/api/pets?page=1&limit=8`);
+        if (!res.ok) throw new Error('Failed to fetch pets');
+        const data = await res.json();
+        setPets(data.pets);
+      } catch (error) {
+        setError((error as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPets();
+  }, [user, router]);
+
+  if (!user) return null;
 
   return (
     <>
@@ -26,8 +55,18 @@ const LandingPage = async () => {
               Your one-stop destination to find your new best friend.
             </p>
           </header>
-          <PetContainer pets={pets} />
-
+          {loading ? (
+            <div className="text-center">Loading pets...</div>
+          ) : error ? (
+            <div className="text-red-500 text-center">{error}</div>
+          ) : (
+            <>
+              <PetContainer pets={pets} />
+              {pets.length === 0 && (
+                <div className="text-center">No pets available</div>
+              )}
+            </>
+          )}
           <div className="flex justify-center mt-4">
             <Button asChild>
               <Link href="/app/pets">Browse Pets</Link>

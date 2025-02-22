@@ -17,7 +17,7 @@ const PetCard = ({ pet }: { pet: Pet }) => {
   const imageUrl =
     pet.avatar && pet.avatar.startsWith("http") ? pet.avatar : defaultImage;
 
-  const avatarpath = "/pets/images_7-bIAfoSJ.jpeg";
+  const avatarpath = pet.avatar || "/pets/images_7-bIAfoSJ.jpeg";
   return (
     <div className="w-full">
       <Link

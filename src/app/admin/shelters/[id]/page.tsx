@@ -1,4 +1,3 @@
-// src/app/admin/shelters/[id]/page.tsx
 import { getShelterByIdFromDB } from '@/lib/database';
 import ShelterDetailPage from './ShelterDetailPage';
 

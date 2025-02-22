@@ -1,7 +1,6 @@
-// src/app/admin/shelters/page.tsx
 import { getShelterPageCount, getShelters } from '@/mocks/shelter';
 
-import {deleteShelter} from '@/lib/actions'; 
+import { deleteShelter } from '@/lib/actions';
 import AppPagination from "@/components/pagination";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
