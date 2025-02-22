@@ -27,45 +27,45 @@ export default function AnalysisTab({ shelter }: { shelter: Shelter }) {
         <h2 className="text-xl font-bold mb-4 mt-8">Shelter Information</h2>
         <Card className="p-0 overflow-hidden">
           <CardContent className="p-0">
-          <div className="flex flex-col sm:flex-row gap-y-4 gap-x-8">
-          {/* Image */}
-          <div>
-            <Image
-              src={shelter.profileImage}
-              alt={shelter.name}
-              width={240}
-              height={240}
-              className="max-h-60"
-              objectFit="cover"
-            />
-          </div>
-          {/* Details */}
-          <div className="flex flex-col gap-2 py-6">
-            <div className="flex items-center gap-4">
-              <p className="text-sm font-semibold text-gray-500">Name:</p>
-              <p>{shelter.name}</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <p className="text-sm font-semibold text-gray-500">Email:</p>
-              <p>{shelter.email}</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <p className="text-sm font-semibold text-gray-500">Phone:</p>
-              <p>{shelter.phone}</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <p className="text-sm font-semibold text-gray-500">Location:</p>
-              <p>{shelter.location}</p>
-            </div>
+            <div className="flex flex-col sm:flex-row gap-y-4 gap-x-8">
+              {/* Image */}
+              <div>
+                <Image
+                  src={shelter.profileImage}
+                  alt={shelter.name}
+                  width={240}
+                  height={240}
+                  className="max-h-60"
+                  objectFit="cover"
+                />
+              </div>
+              {/* Details */}
+              <div className="flex flex-col gap-2 py-6">
+                <div className="flex items-center gap-4">
+                  <p className="text-sm font-semibold text-gray-500">Name:</p>
+                  <p>{shelter.name}</p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <p className="text-sm font-semibold text-gray-500">Email:</p>
+                  <p>{shelter.email}</p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <p className="text-sm font-semibold text-gray-500">Phone:</p>
+                  <p>{shelter.phone}</p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <p className="text-sm font-semibold text-gray-500">Location:</p>
+                  <p>{shelter.location}</p>
+                </div>
 
-            <div className="flex items-center gap-4">
-              <p className="text-sm font-semibold text-gray-500">Available Time:</p>
-              <p>
-                {shelter.availableTime.from} - {shelter.availableTime.to}
-              </p>
+                <div className="flex items-center gap-4">
+                  <p className="text-sm font-semibold text-gray-500">Available Time:</p>
+                  <p>
+                    {shelter.availableTime.from} - {shelter.availableTime.to}
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
           </CardContent>
         </Card>
 

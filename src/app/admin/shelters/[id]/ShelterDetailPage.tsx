@@ -1,4 +1,3 @@
-// src/app/admin/shelters/[id]/ShelterDetailPage.tsx
 'use client';
 
 import { useActionState } from 'react';
@@ -51,7 +50,6 @@ export default function ShelterDetailPage({
                                 <AvatarFallback>{shelter.shelter_name[0]}</AvatarFallback>
                             </Avatar>
                         </div>
-
                         <form action={formAction}>
                             <input type="hidden" name="shelterId" value={shelter.shelter_id} />
                             <div className="space-y-4">
