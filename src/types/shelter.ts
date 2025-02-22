@@ -1,9 +1,9 @@
 export type Shelter = {
-  id: number;
+  shelter_id: number;
   shelter_name: string;
-  email: string;
-  phone: string;
-  profileImage: string;
+  shelter_email: string;
+  shelter_phone: string;
+  avatar: string;
   location: string;
   status: 'pending' | 'approved' | 'rejected';
   capacity: number;

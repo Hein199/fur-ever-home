@@ -107,3 +107,17 @@ export const deleteUserFromDB = async (userId: number) => {
         return { success: false, error: "Failed to delete user" };
     }
 };
+
+// src/lib/database.ts
+export const getShelterByIdFromDB = async (shelterId: number) => {
+    try {
+      const result = await query(
+        "SELECT * FROM shelter WHERE shelter_id = $1",
+        [shelterId]
+      );
+      return result.rows[0] || null;
+    } catch (error) {
+      console.error("Error fetching shelter by ID:", error);
+      return null;
+    }
+  };
