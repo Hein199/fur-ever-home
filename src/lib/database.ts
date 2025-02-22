@@ -108,6 +108,124 @@ export const deleteUserFromDB = async (userId: number) => {
     }
 };
 
+// Fetch pets with pagination
+export const getPetsFromDB = async (page: number = 1, limit: number = 10) => {
+    try {
+        const offset = (page - 1) * limit;
+        const pets = await query(`
+            SELECT pet.*, shelter.shelter_name, users.user_name
+            FROM pet
+            LEFT JOIN shelter_pet ON pet.pet_id = shelter_pet.pet_id
+            LEFT JOIN shelter ON shelter_pet.shelter_id = shelter.shelter_id
+            LEFT JOIN user_pet ON pet.pet_id = user_pet.pet_id
+            LEFT JOIN users ON user_pet.user_id = users.user_id
+            ORDER BY pet.pet_id
+            LIMIT $1 OFFSET $2
+        `, [limit, offset]);
+
+        return pets.rows;
+    } catch (error) {
+        console.error("Error fetching pets:", error);
+        return [];
+    }
+};
+
+// Fetch total pet count for pagination
+export const getPetPageCountFromDB = async (limit: number = 10) => {
+    try {
+        const result = await query("SELECT COUNT(*) FROM pet");
+        return Math.ceil(Number(result.rows[0].count) / limit);
+    } catch (error) {
+        console.error("Error fetching pet count:", error);
+        return 1;
+    }
+};
+
+// Fetch a single pet by ID
+export const getPetByIdFromDB = async (petId: number) => {
+    try {
+        const pet = await query(
+            `SELECT pet.*, shelter.shelter_name, users.user_name
+             FROM pet
+             LEFT JOIN shelter_pet ON pet.pet_id = shelter_pet.pet_id
+             LEFT JOIN shelter ON shelter_pet.shelter_id = shelter.shelter_id
+             LEFT JOIN user_pet ON pet.pet_id = user_pet.pet_id
+             LEFT JOIN users ON user_pet.user_id = users.user_id
+             WHERE pet.pet_id = $1`,
+            [petId]
+        );
+        return pet.rows[0] || null;
+    } catch (error) {
+        console.error("Error fetching pet by ID:", error);
+        return null;
+    }
+};
+
+// Create a new pet
+export const createPetInDB = async (data: any) => {
+    try {
+        const result = await query(
+            `INSERT INTO pet (pet_name, age, gender, avatar, location, weight, color, size, status, about)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+             RETURNING *`,
+            [
+                data.pet_name,
+                data.age,
+                data.gender,
+                data.avatar,
+                data.location,
+                data.weight,
+                data.color,
+                data.size,
+                data.status,
+                data.about,
+            ]
+        );
+        return result.rows[0];
+    } catch (error) {
+        console.error("Error creating pet:", error);
+        throw error;
+    }
+};
+
+// Update pet
+export const updatePetInDB = async (petId: number, data: any) => {
+    try {
+        const result = await query(
+            `UPDATE pet 
+             SET pet_name = $1, age = $2, gender = $3, avatar = $4, location = $5,
+                 weight = $6, color = $7, size = $8, status = $9, about = $10
+             WHERE pet_id = $11
+             RETURNING *`,
+            [
+                data.pet_name,
+                data.age,
+                data.gender,
+                data.avatar,
+                data.location,
+                data.weight,
+                data.color,
+                data.size,
+                data.status,
+                data.about,
+                petId,
+            ]
+        );
+        return result.rows[0];
+    } catch (error) {
+        console.error("Error updating pet:", error);
+        throw error;
+    }
+};
+
+// Delete pet
+export const deletePetFromDB = async (petId: number) => {
+    try {
+        await query('DELETE FROM pet WHERE pet_id = $1', [petId]);
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting pet:", error);
+        return { success: false, error: "Failed to delete pet" };
 // src/lib/database.ts
 export const getShelterByIdFromDB = async (shelterId: number) => {
     try {

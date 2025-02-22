@@ -2,6 +2,7 @@
 
 import { query } from './database';
 import { updateUserInDB, deleteUserFromDB } from './database';
+import { updatePetInDB, deletePetFromDB } from './database';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
@@ -119,6 +120,49 @@ export async function updateShelter(
       console.error('Delete failed:', error);
       throw new Error('Failed to delete shelter. Please try again.');
     }
+  }
+
+  export async function updatePet(
+    prevState: FormState | null,
+    formData: FormData
+  ): Promise<FormState> {
+    const petId = Number(formData.get('petId'));
+    const petData = {
+      pet_name: formData.get('name') as string,
+      age: formData.get('age') as string,
+      gender: formData.get('gender') as string,
+      location: formData.get('location') as string,
+      avatar: formData.get('avatar') as string || undefined
+    };
+  
+    try {
+      await updatePetInDB(petId, petData);
+      revalidatePath(`/admin/pets/${petId}`);
+  
+      return {
+        success: true,
+        message: 'Pet information updated successfully'
+      };
+    } catch (error) {
+      console.error('Update failed:', error);
+      return {
+        success: false,
+        message: 'Failed to update pet information. Please try again.'
+      };
+    }
+  }
+  
+  export async function deletePet(formData: FormData): Promise<void> {
+    const petId = Number(formData.get('petId'));
+  
+    try {
+      await deletePetFromDB(petId);
+      revalidatePath('/admin/pets');
+    } catch (error) {
+      console.error('Delete failed:', error);
+      throw new Error('Failed to delete pet');
+    }
+    redirect('/admin/pets');
   }
 //Shelter_register
 export async function approveShelter(shelterId: number): Promise<void> {
