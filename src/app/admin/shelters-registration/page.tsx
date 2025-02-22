@@ -1,3 +1,4 @@
+import { approveShelter, rejectShelter } from '@/lib/actions';
 import AppPagination from "@/components/pagination";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getShelterPageCount, getShelters } from "@/mocks/shelter";
+import { getSheltersFromDB, getShelterPageCountFromDB } from "@/lib/database";
 import { Check, XIcon } from "lucide-react";
 import Link from "next/link";
 import AdminBreadcrumb from "../_components/admin-breadcrumb";
@@ -29,8 +30,8 @@ import AdminBreadcrumb from "../_components/admin-breadcrumb";
 export default async function Page(props: { searchParams: Promise<any> }) {
   const { page } = await props.searchParams;
   const pageInt = page ? parseInt(page) : 1;
-  const pageCount = getShelterPageCount();
-  const shelters = getShelters(pageInt);
+  const pageCount = await getShelterPageCountFromDB();
+  const shelters = await getSheltersFromDB(pageInt);
   return (
     <>
       <AdminBreadcrumb title="Shelter Registration" />
@@ -52,43 +53,50 @@ export default async function Page(props: { searchParams: Promise<any> }) {
               <TableBody>
                 {shelters.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center">
+                    <TableCell colSpan={7} className="h-24 text-center">
                       No shelters found.
                     </TableCell>
                   </TableRow>
                 ) : (
                   shelters.map((shelter) => (
-                    <TableRow key={shelter.id}>
-                      <TableCell>{shelter.id}</TableCell>
+                    <TableRow key={shelter.shelter_id}>
+                      <TableCell>{shelter.shelter_id}</TableCell>
                       <TableCell>
                         <Avatar>
                           <AvatarImage
-                            src={shelter.profileImage}
-                            alt={shelter.name}
+                            src={shelter.avatar}
+                            alt={shelter.shelter_name}
                           />
-                          <AvatarFallback>{shelter.name[0]}</AvatarFallback>
+                          <AvatarFallback>{shelter.shelter_name[0]}</AvatarFallback>
                         </Avatar>
                       </TableCell>
                       <TableCell>
                         <Link
                           href={{
-                            pathname: `/admin/shelters/${shelter.id}`,
+                            pathname: `/admin/shelters/${shelter.shelter_id}`,
                             search: `?origin=register`,
                           }}
                           className="text-primary underline"
                         >
-                          {shelter.name}
+                          {shelter.shelter_name}
                         </Link>
                       </TableCell>
-                      <TableCell>{shelter.email}</TableCell>
-                      <TableCell>{shelter.phone}</TableCell>
+                      <TableCell>{shelter.shelter_email}</TableCell>
+                      <TableCell>{shelter.shelter_phone}</TableCell>
                       <TableCell>{shelter.location}</TableCell>
                       <TableCell className="flex gap-2 items-center justify-center">
-                        {shelter.status === "pending" && (
+                        {shelter.status === "Pending" && (
                           <>
-                            <Button variant="ghost" size="icon" color="primary">
-                              <Check className="w-6 h-6" />
-                            </Button>
+                            {/* Approve Button */}
+                            <form action={async () => {
+                              'use server';
+                              await approveShelter(shelter.shelter_id);
+                            }}>
+                              <Button variant="ghost" size="icon" color="primary">
+                                <Check className="w-6 h-6" />
+                              </Button>
+                            </form>
+                            {/* Reject Button */}
                             <Dialog>
                               <DialogTrigger asChild>
                                 <Button
@@ -106,7 +114,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
                                   </DialogTitle>
                                   <DialogDescription>
                                     This action cannot be undone. This will
-                                    permanently reject {shelter.name} from the
+                                    permanently reject {shelter.shelter_name} from the
                                     database.
                                   </DialogDescription>
                                 </DialogHeader>
@@ -114,13 +122,18 @@ export default async function Page(props: { searchParams: Promise<any> }) {
                                   <DialogClose asChild>
                                     <Button variant="ghost">Cancel</Button>
                                   </DialogClose>
-                                  <Button variant="destructive">Reject</Button>
+                                  <form action={async () => {
+                                    'use server';
+                                    await rejectShelter(shelter.shelter_id);
+                                  }}>
+                                    <Button variant="destructive">Reject</Button>
+                                  </form>
                                 </DialogFooter>
                               </DialogContent>
                             </Dialog>
                           </>
                         )}
-                        {shelter.status === "approved" && (
+                        {shelter.status === "Approved" && (
                           <Badge
                             className="text-green-700"
                             variant={"secondary"}
@@ -128,7 +141,7 @@ export default async function Page(props: { searchParams: Promise<any> }) {
                             Approved
                           </Badge>
                         )}
-                        {shelter.status === "rejected" && (
+                        {shelter.status === "Rejected" && (
                           <Badge variant="destructive">Rejected</Badge>
                         )}
                       </TableCell>
