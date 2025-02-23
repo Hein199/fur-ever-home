@@ -12,42 +12,54 @@ export async function GET() {
     }
 
     try {
-        let table, idColumn, emailColumn, nameColumn;
+        let sqlQuery;
+        let params = [sessionId];
+
         switch (userRole) {
             case 'user':
-                table = 'users';
-                idColumn = 'user_id';
-                emailColumn = 'user_email';
-                nameColumn = 'user_name';
+                sqlQuery = `
+                    SELECT 
+                        user_id as id,
+                        user_email as email,
+                        user_name as name,
+                        user_phone as phone,
+                        location,
+                        avatar
+                    FROM users 
+                    WHERE user_id = $1
+                `;
                 break;
             case 'shelter':
-                table = 'shelter';
-                idColumn = 'shelter_id';
-                emailColumn = 'shelter_email';
-                nameColumn = 'shelter_name';
+                sqlQuery = `
+                    SELECT 
+                        shelter_id as id,
+                        shelter_email as email,
+                        shelter_name as name,
+                        shelter_phone as phone,
+                        location,
+                        avatar
+                    FROM shelter 
+                    WHERE shelter_id = $1
+                `;
                 break;
             case 'admin':
-                table = 'admin';
-                idColumn = 'admin_id';
-                emailColumn = 'admin_email';
-                nameColumn = 'admin_name';
+                sqlQuery = `
+                    SELECT 
+                        admin_id as id,
+                        admin_email as email,
+                        admin_name as name,
+                        admin_phone as phone,
+                        NULL as location,
+                        NULL as avatar
+                    FROM admin 
+                    WHERE admin_id = $1
+                `;
                 break;
             default:
                 return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
         }
 
-        // const result = await query(
-        //     `SELECT ${idColumn}, ${emailColumn}, ${nameColumn} FROM ${table} WHERE ${idColumn} = $1`,
-        //     [sessionId]
-        // );
-
-        const result = await query(
-            `SELECT ${idColumn}, ${emailColumn}, ${nameColumn}, 
-                    user_phone, location, avatar 
-             FROM ${table} 
-             WHERE ${idColumn} = $1`,
-            [sessionId]
-        );
+        const result = await query(sqlQuery, params);
 
         if (!result.rows[0]) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -56,22 +68,17 @@ export async function GET() {
         const user = result.rows[0];
 
         return NextResponse.json({
-            id: user[idColumn],
+            id: user.id,
             role: userRole,
-            email: user[emailColumn],
-            name: user[nameColumn],
-            phone: user.user_phone,
-            location: user.location,
-            avatar: user.avatar
+            email: user.email,
+            name: user.name,
+            phone: user.phone || null,
+            location: user.location || null,
+            avatar: user.avatar || null
         });
-        // return NextResponse.json({
-        //     id: user[idColumn],
-        //     role: userRole,
-        //     email: user[emailColumn],
-        //     name: user[nameColumn]
-        // });
 
     } catch (error) {
+        console.error('Validation error:', error);
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
