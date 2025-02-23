@@ -1,6 +1,5 @@
 import { query } from '@/lib/database';
 import bcrypt from 'bcrypt';
-import { SignJWT } from 'jose';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -42,15 +41,6 @@ export async function POST(request: Request) {
         const validPassword = await bcrypt.compare(password, user.hashed_password);
         if (!validPassword) return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
 
-        const token = await new SignJWT({
-            id: user[idColumn],
-            role,
-            email: user[emailColumn]
-        })
-            .setProtectedHeader({ alg: 'HS256' })
-            .setExpirationTime('1d')
-            .sign(new TextEncoder().encode(process.env.JWT_SECRET!));
-
         const response = NextResponse.json({
             id: user[idColumn],
             role,
@@ -58,11 +48,20 @@ export async function POST(request: Request) {
             name: user[nameColumn]
         });
 
-        response.cookies.set('token', token, {
+        // Set session cookies
+        response.cookies.set('sessionId', user[idColumn].toString(), {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax', // Add this
-            path: '/', // Add this
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 86400 // 24 hours
+        });
+
+        response.cookies.set('userRole', role, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
             maxAge: 86400
         });
 

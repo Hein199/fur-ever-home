@@ -1,8 +1,6 @@
 "use client";
-
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import jwt from 'jsonwebtoken';
 
 type User = {
     id: number;
@@ -25,42 +23,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter();
 
     useEffect(() => {
-        const verifyToken = async () => {
-            console.log('Verifying token...');
-            const token = document.cookie.split('; ').find(row => row.startsWith('token='))?.split('=')[1];
-            if (!token) {
-                console.log('No token found');
-                return;
-            }
-
+        const checkSession = async () => {
             try {
-                console.log('Validating token:', token);
-                const response = await fetch('/api/auth/validate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    console.error('Token validation failed with status:', response.status);
-                    throw new Error('Token validation failed');
-                }
-                const userData = await response.json();
-                console.log('Token validated successfully:', userData);
-                setUser(userData);
-
-                // Client-side redirect only if on login/signup page
-                if (['/login', '/sign-up'].includes(window.location.pathname)) {
-                    redirectBasedOnRole(userData.role);
+                const response = await fetch('/api/auth/validate');
+                if (response.ok) {
+                    const userData = await response.json();
+                    setUser(userData);
                 }
             } catch (error) {
-                console.error('Token validation error:', error);
+                console.error('Session validation error:', error);
                 logout();
             }
         };
-        verifyToken();
+        checkSession();
     }, []);
 
     const login = async (email: string, password: string, role: string) => {
@@ -79,15 +54,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const userData = await res.json();
             setUser(userData);
 
-            // Immediately redirect after successful login
             const redirectPath = userData.role === 'user' ? '/'
                 : userData.role === 'shelter' ? '/shelter'
                     : '/admin';
             router.push(redirectPath);
-
         } catch (error: any) {
             console.error('Login error:', error);
-            alert(error.message || "Login failed");
+            throw error;
+        }
+    };
+
+    const logout = async () => {
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            setUser(null);
+            router.push('/login');
+        } catch (error) {
+            console.error('Logout error:', error);
         }
     };
 
@@ -103,12 +86,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const userData = await res.json();
         setUser(userData);
         redirectBasedOnRole(userData.role);
-    };
-
-    const logout = () => {
-        document.cookie = 'token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-        setUser(null);
-        router.push('/login');
     };
 
     const redirectBasedOnRole = (role: string) => {
