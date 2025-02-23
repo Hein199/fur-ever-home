@@ -37,8 +37,16 @@ export default function PetFormCard({ pet }: PetFormCardProps) {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setPetData({ ...petData, [e.target.id]: e.target.value });
+    const { id, value } = e.target;
+    setPetData((prev) => ({
+        ...prev,
+        [id]: id === "weight" ? Number(value) : value, // 🔹 Ensure weight is stored as a number
+    }));
   };
+
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  //   setPetData({ ...petData, [e.target.id]: e.target.value });
+  // };
 
   const handleImageUpload = (filePath: string) => {
     setPetData({ ...petData, avatar: filePath });
@@ -116,7 +124,7 @@ export default function PetFormCard({ pet }: PetFormCardProps) {
         )}
 
         <div className="space-y-4">
-          {petData.pet_id > 0 && (
+          {(petData.pet_id ?? 0) > 0 && (
             <div className="space-y-2">
               <Label htmlFor="pet-id">Pet ID</Label>
               <Input id="pet-id" value={petData.pet_id} readOnly />
@@ -126,34 +134,41 @@ export default function PetFormCard({ pet }: PetFormCardProps) {
             <Label htmlFor="pet_name">Name</Label>
             <Input id="pet_name" value={petData.pet_name} onChange={handleChange} required />
           </div>
-          <div className="space-y-4">
+          <div className="space-y-2">
             <Label htmlFor="weight">Weight (kg)</Label>
-            <Input id="weight" value={petData.weight} onChange={handleChange} />
+            <Input id="weight" type="number" value={petData.weight} onChange={handleChange} />
           </div>
-          <div className="space-y-4">
+
+          <div className="space-y-2">
             <Label htmlFor="color">Color</Label>
             <Input id="color" value={petData.color} onChange={handleChange} />
           </div>
-          <div className="space-y-4">
+
+          <div className="space-y-2">
             <Label htmlFor="size">Size</Label>
             <Input id="size" value={petData.size} onChange={handleChange} />
           </div>
-          <div className="space-y-4">
+
+          <div className="space-y-2">
             <Label htmlFor="status">Status</Label>
             <Input id="status" value={petData.status} onChange={handleChange} />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="age">Age</Label>
             <Input id="age" value={petData.age} onChange={handleChange} required />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="gender">Gender</Label>
             <Input id="gender" value={petData.gender} onChange={handleChange} required />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="location">Location</Label>
             <Textarea id="location" value={petData.location} onChange={handleChange} required />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="about">About</Label>
             <Textarea id="about" value={petData.about} onChange={handleChange} required />
