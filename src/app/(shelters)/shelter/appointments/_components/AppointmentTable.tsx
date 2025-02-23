@@ -1,33 +1,59 @@
-// src/app/(shelters)/shelter/appointments/_components/AppointmentTable.tsx
 "use client";
 
 import { useAuth } from "@/context/auth-context";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import AppPagination from "@/components/pagination";
-import { getAppointmentsForShelter, getAppointmentPageCountForShelter } from "@/lib/database";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+interface Appointment {
+  appointment_id: number;
+  appointment_date: string;
+  appointment_time: string;
+  user_name: string;
+  user_email: string;
+}
 
 export default function AppointmentTable({ initialPage = 1 }: { initialPage?: number }) {
   const { user } = useAuth();
-  const [appointments, setAppointments] = useState([]);
+  const router = useRouter();
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [pageCount, setPageCount] = useState(1);
   const [currentPage, setCurrentPage] = useState(initialPage);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (user && user.role === 'shelter') {
+    if (user?.role === "shelter") {
       const fetchAppointments = async () => {
-        const response = await fetch(`/api/appointments?shelterId=${user.id}&page=${currentPage}`);
-        const data = await response.json();
-        setAppointments(data.appointments);
-        setPageCount(data.pageCount);
+        try {
+          setIsLoading(true);
+          const response = await fetch(`/api/appointments?shelterId=${user.id}&page=${currentPage}`);
+          if (!response.ok) throw new Error("Failed to fetch appointments");
+          const data = await response.json();
+          setAppointments(data.appointments);
+          setPageCount(data.pageCount);
+        } catch (error) {
+          console.error("Error fetching appointments:", error);
+        } finally {
+          setIsLoading(false);
+        }
       };
       fetchAppointments();
     }
   }, [user, currentPage]);
 
-  if (!user || user.role !== 'shelter') {
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    router.push(`/shelter/appointments?page=${newPage}`);
+  };
+
+  if (!user || user.role !== "shelter") {
     return <div>Unauthorized</div>;
+  }
+
+  if (isLoading) {
+    return <div>Loading appointments...</div>;
   }
 
   return (
@@ -46,7 +72,7 @@ export default function AppointmentTable({ initialPage = 1 }: { initialPage?: nu
           <TableBody>
             {appointments.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
+                <TableCell colSpan={5} className="h-24 text-center">
                   No appointments found.
                 </TableCell>
               </TableRow>
@@ -67,7 +93,11 @@ export default function AppointmentTable({ initialPage = 1 }: { initialPage?: nu
         </Table>
       </CardContent>
       <CardFooter className="mt-4">
-        <AppPagination page={currentPage} totalPage={pageCount} onPageChange={setCurrentPage} />
+        <AppPagination
+          page={currentPage}
+          totalPage={pageCount}
+          onPageChange={handlePageChange}
+        />
       </CardFooter>
     </Card>
   );
