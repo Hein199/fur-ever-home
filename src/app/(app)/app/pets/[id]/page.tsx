@@ -149,11 +149,13 @@ const ApplicationDialog = ({ pet }: { pet: any }) => {
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [submitted, setSubmitted] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [open, setOpen] = useState(false); // ✅ Control modal state
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
 
-    // Remove error message once field is filled
     if (errors[e.target.id]) {
       setErrors({ ...errors, [e.target.id]: "" });
     }
@@ -162,7 +164,6 @@ const ApplicationDialog = ({ pet }: { pet: any }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate required fields
     const newErrors: { [key: string]: string } = {};
     Object.entries(formData).forEach(([key, value]) => {
       if (!value) newErrors[key] = "This field is required.";
@@ -175,15 +176,26 @@ const ApplicationDialog = ({ pet }: { pet: any }) => {
 
     setErrors({});
     setSubmitted(true);
+    setErrorMsg("");
 
-    setTimeout(() => {
-      console.log("Adoption Application Submitted:", formData);
+    try {
+      // Simulating API call (Replace with actual API request)
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      setSuccess(true);
+      setTimeout(() => {
+        setSuccess(false);
+        setSubmitted(false);
+        setOpen(false); // ✅ Close the modal after success
+      }, 2000);
+    } catch (err) {
+      setErrorMsg("Failed to submit application. Please try again.");
       setSubmitted(false);
-    }, 2000);
+    }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="w-full">Adopt {pet.pet_name}</Button>
       </DialogTrigger>
@@ -207,13 +219,12 @@ const ApplicationDialog = ({ pet }: { pet: any }) => {
             {errors.reason && <p className="text-red-500 text-sm">{errors.reason}</p>}
           </div>
 
-          {Object.keys(errors).length > 0 && (
-            <p className="col-span-2 text-red-500 text-sm">Please fill in all required fields.</p>
-          )}
+          {errorMsg && <p className="col-span-2 text-red-500 text-sm">{errorMsg}</p>}
+          {success && <p className="col-span-2 text-green-500 text-sm">Application submitted successfully! 🎉</p>}
         </form>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="ghost">Cancel</Button>
+            <Button variant="ghost" disabled={submitted}>Cancel</Button>
           </DialogClose>
           <Button type="submit" onClick={handleSubmit} disabled={submitted}>
             {submitted ? "Submitting..." : "Submit Application"}
@@ -231,3 +242,4 @@ const LabelInput = ({ id, label, type = "text", value, onChange, error }: any) =
     {error && <p className="text-red-500 text-sm">{error}</p>}
   </div>
 );
+
