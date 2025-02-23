@@ -18,7 +18,7 @@ const data = {
         {
           title: "Shelters",
           url: "/admin/shelters",
-        },   {
+        }, {
           title: "Shelters Registration",
           url: "/admin/shelters-registration",
         },
@@ -26,10 +26,10 @@ const data = {
           title: "Pet Lists",
           url: "/admin/pets",
         },
-        {
-          title: "Reports",
-          url: "/admin/reports",
-        },
+        // {
+        //   title: "Reports",
+        //   url: "/admin/reports",
+        // },
         {
           title: "Profile",
           url: "/admin/profile",
@@ -39,7 +39,7 @@ const data = {
   ],
 };
 
-const AdminLayout = ({ children }:{
+const AdminLayout = ({ children }: {
   children: React.ReactNode
 }) => {
   return (

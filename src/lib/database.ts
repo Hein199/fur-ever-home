@@ -231,17 +231,25 @@ export const deletePetFromDB = async (petId: number) => {
 // src/lib/database.ts
 export const getShelterByIdFromDB = async (shelterId: number) => {
     try {
-      const result = await query(
-        "SELECT * FROM shelter WHERE shelter_id = $1",
-        [shelterId]
-      );
-      return result.rows[0] || null;
+        const result = await query(
+            `SELECT shelter_id, shelter_name, shelter_email, shelter_phone, 
+             location, capacity, opening_time, closing_time, avatar 
+             FROM shelter WHERE shelter_id = $1`,
+            [shelterId]
+        );
+        return result.rows[0] ? {
+            ...result.rows[0],
+            availableTime: {
+                from: result.rows[0].opening_time,
+                to: result.rows[0].closing_time
+            }
+        } : null;
     } catch (error) {
-      console.error("Error fetching shelter by ID:", error);
-      return null;
+        console.error("Error fetching shelter:", error);
+        return null;
     }
-  };
-  // src/lib/database.ts
+};
+// src/lib/database.ts
 
 // Function to get shelters from the database
 export const getSheltersFromDB = async (page: number = 1, limit: number = 10) => {
@@ -266,5 +274,93 @@ export const getShelterPageCountFromDB = async (limit: number = 10) => {
     } catch (error) {
         console.error("Error fetching shelter count:", error);
         return 1;
+    }
+};
+
+export const updateShelterInDB = async (
+    shelterId: number,
+    data: {
+        shelter_name: string;
+        shelter_email: string;
+        shelter_phone: string;
+        location: string;
+        capacity: number;
+        opening_time: string;
+        closing_time: string;
+        avatar?: string;
+    }
+) => {
+    try {
+        const result = await query(
+            `UPDATE shelter 
+             SET shelter_name = $1,
+                 shelter_email = $2,
+                 shelter_phone = $3,
+                 location = $4,
+                 capacity = $5,
+                 opening_time = $6,
+                 closing_time = $7,
+                 avatar = COALESCE($8, avatar)
+             WHERE shelter_id = $9
+             RETURNING *`,
+            [
+                data.shelter_name,
+                data.shelter_email,
+                data.shelter_phone,
+                data.location,
+                data.capacity,
+                data.opening_time,
+                data.closing_time,
+                data.avatar,
+                shelterId
+            ]
+        );
+        return result.rows[0];
+    } catch (error) {
+        console.error("Error updating shelter:", error);
+        throw error;
+    }
+};
+
+export const getAdminByIdFromDB = async (adminId: number) => {
+    try {
+        const result = await query(
+            "SELECT admin_id, admin_name, admin_email, admin_phone FROM admin WHERE admin_id = $1",
+            [adminId]
+        );
+        return result.rows[0] || null;
+    } catch (error) {
+        console.error("Error fetching admin by ID:", error);
+        return null;
+    }
+};
+
+export const updateAdminInDB = async (
+    adminId: number,
+    data: {
+        admin_name: string;
+        admin_email: string;
+        admin_phone: string;
+    }
+) => {
+    try {
+        const result = await query(
+            `UPDATE admin 
+            SET admin_name = $1,
+                admin_email = $2, 
+                admin_phone = $3
+            WHERE admin_id = $4
+            RETURNING *`,
+            [
+                data.admin_name,
+                data.admin_email,
+                data.admin_phone,
+                adminId
+            ]
+        );
+        return result.rows[0];
+    } catch (error) {
+        console.error("Error updating admin:", error);
+        throw error;
     }
 };
