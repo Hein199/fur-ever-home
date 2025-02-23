@@ -364,3 +364,36 @@ export const updateAdminInDB = async (
         throw error;
     }
 };
+
+// src/lib/database.ts
+export const getAppointmentsForShelter = async (shelterId: number, page: number = 1, limit: number = 10) => {
+    try {
+        const offset = (page - 1) * limit;
+        const result = await query(
+            `SELECT appointment.*, users.user_name, users.user_email
+             FROM appointment
+             JOIN users ON appointment.user_id = users.user_id
+             WHERE appointment.shelter_id = $1
+             ORDER BY appointment.appointment_date, appointment.appointment_time
+             LIMIT $2 OFFSET $3`,
+            [shelterId, limit, offset]
+        );
+        return result.rows;
+    } catch (error) {
+        console.error("Error fetching appointments:", error);
+        return [];
+    }
+};
+
+export const getAppointmentPageCountForShelter = async (shelterId: number, limit: number = 10) => {
+    try {
+        const result = await query(
+            "SELECT COUNT(*) FROM appointment WHERE shelter_id = $1",
+            [shelterId]
+        );
+        return Math.ceil(Number(result.rows[0].count) / limit);
+    } catch (error) {
+        console.error("Error fetching appointment count:", error);
+        return 1;
+    }
+};
