@@ -45,7 +45,10 @@ export async function POST(request: Request) {
             id: user[idColumn],
             role,
             email: user[emailColumn],
-            name: user[nameColumn]
+            name: user[nameColumn],
+            phone: user.user_phone,
+            location: user.location,
+            avatar: user.avatar
         });
 
         // Set session cookies

@@ -92,6 +92,43 @@ export const updateUserInDB = async (
     }
 };
 
+// src/lib/database.ts
+export const userUpdateUserInDB = async (
+    userId: number,
+    data: {
+        user_name: string;
+        user_email: string;
+        user_phone: string;
+        location: string;
+        avatar?: string;
+    }
+) => {
+    try {
+        const result = await query(
+            `UPDATE users 
+             SET user_name = $1,
+                 user_email = $2, 
+                 user_phone = $3, 
+                 location = $4,
+                 avatar = COALESCE($5, avatar)
+             WHERE user_id = $6
+             RETURNING *`,
+            [
+                data.user_name,
+                data.user_email,
+                data.user_phone,
+                data.location,
+                data.avatar,
+                userId
+            ]
+        );
+        return result.rows[0];
+    } catch (error) {
+        console.error("Error updating user:", error);
+        throw error;
+    }
+};
+
 // Function to delete a user from the database
 export const deleteUserFromDB = async (userId: number) => {
     try {

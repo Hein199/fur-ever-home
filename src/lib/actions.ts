@@ -1,6 +1,6 @@
 'use server';
 
-import { query, updateShelterInDB } from './database';
+import { query, updateShelterInDB, userUpdateUserInDB } from './database';
 import { updateUserInDB, deleteUserFromDB } from './database';
 import { updatePetInDB, deletePetFromDB } from './database';
 import { updateAdminInDB } from './database';
@@ -40,6 +40,37 @@ export async function updateUser(
     return {
       success: false,
       message: 'Failed to update user information. Please try again.'
+    };
+  }
+}
+
+// src/lib/actions.ts
+export async function userUpdateUser(
+  prevState: FormState | null,
+  formData: FormData
+): Promise<FormState> {
+  const userId = Number(formData.get('userId'));
+  const userData = {
+    user_name: formData.get('name') as string,
+    user_email: formData.get('email') as string,
+    user_phone: formData.get('phone') as string,
+    location: formData.get('location') as string,
+    avatar: formData.get('avatar') as string || undefined
+  };
+
+  try {
+    await userUpdateUserInDB(userId, userData);
+    revalidatePath(`/app/profile`);
+
+    return {
+      success: true,
+      message: 'Profile updated successfully'
+    };
+  } catch (error) {
+    console.error('Update failed:', error);
+    return {
+      success: false,
+      message: 'Failed to update profile. Please try again.'
     };
   }
 }
