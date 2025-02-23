@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import ImpactSection from "@/components/ui/impact";
 import { PawPrint } from "lucide-react";
 import Link from "next/link";
-import { IKImage } from "imagekitio-next";
 import { useAuth } from "@/context/auth-context";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";

@@ -47,7 +47,7 @@ const PetCard = ({ pet }: { pet: Pet }) => {
           />
           <div className="text-center absolute inset-0 bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center text-white p-4">
             <h3 className="text-xl font-bold">{pet.pet_name}</h3>
-            <p className="text-sm">{pet.age} years old</p>
+            <p className="text-sm">{pet.age} old</p>
             {pet.shelter?.shelter_name ? (
               <p className="text-sm">Shelter: {pet.shelter.shelter_name}</p>
             ) : pet.owner?.user_name ? (
