@@ -108,12 +108,15 @@ export const deleteUserFromDB = async (userId: number) => {
     }
 };
 
+
 // Fetch pets with pagination
 export const getPetsFromDB = async (page: number = 1, limit: number = 10) => {
     try {
         const offset = (page - 1) * limit;
         const pets = await query(`
-            SELECT pet.*, shelter.shelter_name, users.user_name
+            SELECT pet.pet_id, pet.pet_name, pet.age, pet.gender, pet.avatar, pet.location, 
+                   pet.weight, pet.color, pet.size, pet.status, pet.about,
+                   shelter.shelter_name, users.user_name
             FROM pet
             LEFT JOIN shelter_pet ON pet.pet_id = shelter_pet.pet_id
             LEFT JOIN shelter ON shelter_pet.shelter_id = shelter.shelter_id
@@ -141,11 +144,12 @@ export const getPetPageCountFromDB = async (limit: number = 10) => {
     }
 };
 
-// Fetch a single pet by ID
 export const getPetByIdFromDB = async (petId: number) => {
     try {
         const pet = await query(
-            `SELECT pet.*, shelter.shelter_name, users.user_name
+            `SELECT pet.pet_id, pet.pet_name, pet.age, pet.gender, pet.avatar, pet.location, 
+                    pet.weight, pet.color, pet.size, pet.status, pet.about,  -- 🔹 Added missing fields
+                    shelter.shelter_name, users.user_name
              FROM pet
              LEFT JOIN shelter_pet ON pet.pet_id = shelter_pet.pet_id
              LEFT JOIN shelter ON shelter_pet.shelter_id = shelter.shelter_id

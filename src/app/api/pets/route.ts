@@ -10,13 +10,18 @@ export async function GET(request: Request) {
   try {
     // Fetch pets from the database
     const pets = await query(`
-      SELECT pet_id, pet_name, age, gender, location, avatar FROM pet
+      SELECT pet_id, pet_name, age, gender, location, avatar, weight, color, size, status FROM pet
       ORDER BY pet_id
       LIMIT $1 OFFSET $2`, [limit, offset]);
+      
+    const totalCountResult = await query("SELECT COUNT(*) FROM pet");
+    const totalPets = parseInt(totalCountResult.rows[0].count, 10);
+    const totalPages = Math.ceil(totalPets / limit);
 
     console.log("API Response:", pets.rows); // Debug log
+    
 
-    return NextResponse.json({ pets: pets.rows, totalPages: 10 }); // Adjust total pages if needed
+    return NextResponse.json({ pets: pets.rows, totalPages: 10 }); // Adjust total pages
   } catch (error) {
     console.error("API Error:", error);
     return NextResponse.json({ error: "Failed to fetch pets" }, { status: 500 });

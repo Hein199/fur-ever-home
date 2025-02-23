@@ -72,7 +72,7 @@ export default function PetTable() {
             <TableHead>Color</TableHead>
             <TableHead>Size</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Action</TableHead>
+            <TableHead className="text-center">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -110,16 +110,18 @@ export default function PetTable() {
                 <TableCell>{pet.color}</TableCell>
                 <TableCell>{pet.size}</TableCell>
                 <TableCell>{pet.status}</TableCell>
-                <TableCell>{pet.about}</TableCell>
-                <TableCell className="flex gap-2 items-center justify-center">
-                  <Button variant="ghost" size="icon" asChild>
-                    <Link href={`/admin/pets/${pet.pet_id}`}>
-                      <SquarePen className="w-6 h-6" />
-                    </Link>
-                  </Button>
-                  <Button variant="destructive" size="icon" onClick={() => handleDelete(pet.pet_id)}>
-                    <Trash className="w-6 h-6" />
-                  </Button>
+                {/* <TableCell>{pet.about}</TableCell>  */}
+                <TableCell className="w-[150px] text-center">
+                  <div className="flex gap-2 items-center">
+                    <Button variant="ghost" size="icon" asChild>
+                      <Link href={`/admin/pets/${pet.pet_id}`}>
+                        <SquarePen className="w-6 h-6" />
+                      </Link>
+                    </Button>
+                    <Button variant="destructive" size="icon" onClick={() => handleDelete(pet.pet_id)}>
+                      <Trash className="w-6 h-6" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))
