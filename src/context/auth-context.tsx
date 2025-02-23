@@ -2,12 +2,22 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+// type User = {
+//     id: number;
+//     role: 'user' | 'shelter' | 'admin';
+//     email: string;
+//     name: string;
+// } | null;
 type User = {
     id: number;
     role: 'user' | 'shelter' | 'admin';
     email: string;
     name: string;
+    phone?: string;
+    location?: string;
+    avatar?: string;
 } | null;
+
 
 type AuthContextType = {
     user: User;

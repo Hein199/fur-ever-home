@@ -36,8 +36,16 @@ export async function GET() {
                 return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
         }
 
+        // const result = await query(
+        //     `SELECT ${idColumn}, ${emailColumn}, ${nameColumn} FROM ${table} WHERE ${idColumn} = $1`,
+        //     [sessionId]
+        // );
+
         const result = await query(
-            `SELECT ${idColumn}, ${emailColumn}, ${nameColumn} FROM ${table} WHERE ${idColumn} = $1`,
+            `SELECT ${idColumn}, ${emailColumn}, ${nameColumn}, 
+                    user_phone, location, avatar 
+             FROM ${table} 
+             WHERE ${idColumn} = $1`,
             [sessionId]
         );
 
@@ -46,12 +54,22 @@ export async function GET() {
         }
 
         const user = result.rows[0];
+
         return NextResponse.json({
             id: user[idColumn],
             role: userRole,
             email: user[emailColumn],
-            name: user[nameColumn]
+            name: user[nameColumn],
+            phone: user.user_phone,
+            location: user.location,
+            avatar: user.avatar
         });
+        // return NextResponse.json({
+        //     id: user[idColumn],
+        //     role: userRole,
+        //     email: user[emailColumn],
+        //     name: user[nameColumn]
+        // });
 
     } catch (error) {
         return NextResponse.json(
